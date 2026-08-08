@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intelligent Inventory Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f3f4f6; color: #111827; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+    h1 { margin: 0 0 0.25rem 0; }
+    .subtitle { margin: 0 0 1rem 0; color: #4b5563; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .metric { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; }
+    .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    label { font-size: 0.9rem; color: #374151; display: block; margin-bottom: 0.25rem; }
+    input, select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+    th, td { padding: 0.6rem; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 0.92rem; }
+    th { background: #f9fafb; }
+    .badge { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px; }
+    .low { background: #fee2e2; color: #991b1b; }
+    .ok { background: #dcfce7; color: #166534; }
+    .alerts { margin-top: 1rem; background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.8rem; }
+    .alerts ul { margin: 0.4rem 0 0 1.1rem; padding: 0; }
+    .alerts li { margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Intelligent Inventory Dashboard</h1>
+    <p class="subtitle">Real-time dealership stock overview • Last refresh: <span id="lastUpdated">-</span></p>
+
+    <div class="grid">
+      <div class="card"><div>Total Units</div><div class="metric" id="totalUnits">0</div></div>
+      <div class="card"><div>In Stock Units</div><div class="metric" id="inStockUnits">0</div></div>
+      <div class="card"><div>Low Stock Models</div><div class="metric" id="lowStockModels">0</div></div>
+      <div class="card"><div>Avg Days in Stock</div><div class="metric" id="avgDays">0</div></div>
+    </div>
+
+    <div class="filters">
+      <div>
+        <label for="makeFilter">Filter by make</label>
+        <select id="makeFilter"><option value="">All makes</option></select>
+      </div>
+      <div>
+        <label for="riskFilter">Filter by replenishment risk</label>
+        <select id="riskFilter">
+          <option value="">All risk levels</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div>
+        <label for="search">Search model</label>
+        <input id="search" type="text" placeholder="e.g. Civic" />
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Make</th>
+          <th>Units</th>
+          <th>Days in Stock</th>
+          <th>Demand Score</th>
+          <th>Risk</th>
+          <th>Recommendation</th>
+        </tr>
+      </thead>
+      <tbody id="inventoryBody"></tbody>
+    </table>
+
+    <div class="alerts">
+      <strong>Smart Alerts</strong>
+      <ul id="alertsList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const inventory = [
+      { model: 'Civic', make: 'Honda', units: 8, daysInStock: 21, demandScore: 85 },
+      { model: 'CR-V', make: 'Honda', units: 2, daysInStock: 12, demandScore: 90 },
+      { model: 'Corolla', make: 'Toyota', units: 6, daysInStock: 34, demandScore: 78 },
+      { model: 'RAV4', make: 'Toyota', units: 1, daysInStock: 18, demandScore: 92 },
+      { model: 'Model 3', make: 'Tesla', units: 4, daysInStock: 45, demandScore: 70 },
+      { model: 'CX-5', make: 'Mazda', units: 3, daysInStock: 29, demandScore: 75 }
+    ];
+
+    const makeFilter = document.getElementById('makeFilter');
+    const riskFilter = document.getElementById('riskFilter');
+    const searchInput = document.getElementById('search');
+
+    function getRisk(item) {
+      if (item.units <= 2 && item.demandScore >= 80) return 'High';
+      if (item.units <= 4 || item.daysInStock >= 40) return 'Medium';
+      return 'Low';
+    }
+
+    function recommendationFor(item, risk) {
+      if (risk === 'High') return 'Reorder immediately';
+      if (item.daysInStock >= 40) return 'Start promotional pricing';
+      if (risk === 'Medium') return 'Monitor weekly';
+      return 'Healthy stock';
+    }
+
+    function refreshMakeOptions() {
+      const makes = [...new Set(inventory.map(i => i.make))];
+      makes.forEach(make => {
+        const option = document.createElement('option');
+        option.value = make;
+        option.textContent = make;
+        makeFilter.appendChild(option);
+      });
+    }
+
+    function applyRealtimeFluctuation() {
+      const idx = Math.floor(Math.random() * inventory.length);
+      const delta = Math.random() > 0.5 ? 1 : -1;
+      inventory[idx].units = Math.max(0, inventory[idx].units + delta);
+      inventory[idx].daysInStock += 1;
+    }
+
+    function filteredInventory() {
+      const make = makeFilter.value;
+      const risk = riskFilter.value;
+      const search = searchInput.value.trim().toLowerCase();
+      return inventory.filter(item => {
+        const itemRisk = getRisk(item);
+        return (!make || item.make === make) &&
+               (!risk || itemRisk === risk) &&
+               (!search || item.model.toLowerCase().includes(search));
+      });
+    }
+
+    function render() {
+      const rows = filteredInventory();
+      const body = document.getElementById('inventoryBody');
+      const alertsList = document.getElementById('alertsList');
+      body.innerHTML = '';
+      alertsList.innerHTML = '';
+
+      rows.forEach(item => {
+        const risk = getRisk(item);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.model}</td>
+          <td>${item.make}</td>
+          <td>${item.units}</td>
+          <td>${item.daysInStock}</td>
+          <td>${item.demandScore}</td>
+          <td><span class="badge ${risk === 'High' ? 'low' : 'ok'}">${risk}</span></td>
+          <td>${recommendationFor(item, risk)}</td>
+        `;
+        body.appendChild(tr);
+
+        if (risk === 'High') {
+          const alert = document.createElement('li');
+          alert.textContent = `${item.make} ${item.model}: high-demand low stock, reorder now.`;
+          alertsList.appendChild(alert);
+        }
+      });
+
+      const totalUnits = inventory.reduce((sum, item) => sum + item.units, 0);
+      const inStockUnits = inventory.filter(i => i.units > 0).reduce((sum, item) => sum + item.units, 0);
+      const lowStockModels = inventory.filter(i => i.units <= 2).length;
+      const avgDays = Math.round(inventory.reduce((sum, item) => sum + item.daysInStock, 0) / inventory.length);
+
+      document.getElementById('totalUnits').textContent = totalUnits;
+      document.getElementById('inStockUnits').textContent = inStockUnits;
+      document.getElementById('lowStockModels').textContent = lowStockModels;
+      document.getElementById('avgDays').textContent = avgDays;
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+
+      if (!alertsList.children.length) {
+        const healthy = document.createElement('li');
+        healthy.textContent = 'No critical alerts.';
+        alertsList.appendChild(healthy);
+      }
+    }
+
+    makeFilter.addEventListener('change', render);
+    riskFilter.addEventListener('change', render);
+    searchInput.addEventListener('input', render);
+
+    refreshMakeOptions();
+    render();
+    setInterval(() => {
+      applyRealtimeFluctuation();
+      render();
+    }, 5000);
+  </script>
+</body>
+</html>
