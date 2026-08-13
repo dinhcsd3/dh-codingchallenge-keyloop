@@ -1,0 +1,123 @@
+.inventory-list-container {
+  padding: 24px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: #999;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.inventory-table {
+  width: 100%;
+  background: white;
+
+  th {
+    font-weight: 600;
+    font-size: 14px;
+    color: #666;
+  }
+
+  td {
+    font-size: 14px;
+  }
+
+  .aging-row {
+    background-color: #ffebee !important;
+  }
+
+  .warning-row {
+    background-color: #fff3e0 !important;
+  }
+}
+
+.days-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 13px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+
+  &.warning {
+    background-color: #fff3e0;
+    color: #e65100;
+  }
+
+  &.aging {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+}
+
+mat-chip {
+  &.status-available {
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+  }
+
+  &.status-sold {
+    background-color: #e0e0e0 !important;
+    color: #424242 !important;
+  }
+
+  &.status-reserved {
+    background-color: #e3f2fd !important;
+    color: #1565c0 !important;
+  }
+}
+
+button[mat-raised-button] {
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+  }
+}
+
+mat-paginator {
+  background: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .inventory-list-container {
+    padding: 16px;
+  }
+
+  .inventory-table {
+    font-size: 12px;
+
+    button[mat-raised-button] {
+      font-size: 12px;
+      padding: 4px 8px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}

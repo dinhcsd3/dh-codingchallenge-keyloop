@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>Log Action for Aging Vehicle</h2>
+
+<mat-dialog-content>
+  <div class="vehicle-info">
+    <h3>{{ data.vehicle.year }} {{ data.vehicle.make }} {{ data.vehicle.model }}</h3>
+    <p><strong>VIN:</strong> {{ data.vehicle.vin }}</p>
+    <p><strong>Days in Stock:</strong> <span class="aging-days">{{ data.vehicle.daysInStock }} days</span></p>
+    <p><strong>Price:</strong> {{ data.vehicle.price | currency }}</p>
+  </div>
+
+  <form [formGroup]="actionForm" class="action-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Action Type</mat-label>
+      <mat-select formControlName="action" required>
+        <mat-option *ngFor="let type of actionTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="actionForm.get('action')?.hasError('required')">
+        Please select an action type
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notes</mat-label>
+      <textarea
+        matInput
+        formControlName="notes"
+        rows="4"
+        placeholder="Describe your proposed action and strategy..."
+        required></textarea>
+      <mat-error *ngIf="actionForm.get('notes')?.hasError('required')">
+        Notes are required
+      </mat-error>
+      <mat-error *ngIf="actionForm.get('notes')?.hasError('minlength')">
+        Notes must be at least 10 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Proposed Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="proposedDate"
+        required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="actionForm.get('proposedDate')?.hasError('required')">
+        Please select a target date
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Your Name</mat-label>
+      <input matInput formControlName="user" required>
+      <mat-error *ngIf="actionForm.get('user')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="!actionForm.valid">
+    Save Action
+  </button>
+</mat-dialog-actions>
+

@@ -1,0 +1,68 @@
+<mat-card class="filter-panel">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>filter_list</mat-icon>
+      Filter Inventory
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input matInput formControlName="searchTerm" placeholder="VIN, Make, or Model">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Make</mat-label>
+          <mat-select formControlName="makes" multiple>
+            <mat-option *ngFor="let make of availableMakes" [value]="make">
+              {{ make }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Model</mat-label>
+          <mat-select formControlName="models" multiple>
+            <mat-option *ngFor="let model of availableModels" [value]="model">
+              {{ model }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="years" multiple>
+            <mat-option *ngFor="let year of availableYears" [value]="year">
+              {{ year }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Days in Stock</mat-label>
+          <mat-select formControlName="ageRange">
+            <mat-option value="">All</mat-option>
+            <mat-option value="0-30">0-30 days</mat-option>
+            <mat-option value="31-60">31-60 days</mat-option>
+            <mat-option value="61-90">61-90 days</mat-option>
+            <mat-option value="90+">90+ days (Aging)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          type="button"
+          (click)="clearFilters()"
+          class="clear-button">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+

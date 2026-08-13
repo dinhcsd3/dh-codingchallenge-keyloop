@@ -1,0 +1,37 @@
+<mat-card class="aging-alert" *ngIf="agingVehicles && agingVehicles.length > 0" [class.warning]="agingVehicles.length > 0">
+  <mat-card-content>
+    <div class="alert-header">
+      <mat-icon>warning</mat-icon>
+      <h2>Aging Stock Alert</h2>
+    </div>
+
+    <div class="alert-stats">
+      <div class="stat-item">
+        <div class="stat-value">{{ agingVehicles.length }}</div>
+        <div class="stat-label">Vehicles >90 Days</div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <div class="stat-value">{{ formatCurrency(getTotalValue()) }}</div>
+        <div class="stat-label">Total Value</div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat-item">
+        <div class="stat-value">{{ getAverageDays() }} days</div>
+        <div class="stat-label">Average Age</div>
+      </div>
+    </div>
+
+    <div class="alert-message">
+      <mat-icon>info</mat-icon>
+      <p>
+        These vehicles require immediate attention. Use the "Log Action" button to document your strategy.
+      </p>
+    </div>
+  </mat-card-content>
+</mat-card>
+
