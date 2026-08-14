@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Date:** August 2026  
-**Author:** AI-Assisted Development  
+**Author:** Dinh Hoang (SWE)  
 **Project:** Keyloop Coding Challenge - Scenario B
 
 ---
